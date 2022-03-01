@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:ninja_prime/ninja_prime.dart';
 
+const int keySize = 256;
+
 /// Extended Euclidean algorithm
 /// Returns [gcd, x, y] where gcd = gcd(a, b),
 ///        x = ay + bx, y = by - a * x
@@ -86,8 +88,9 @@ bool rabinMiller(BigInt n) {
 
   var k = BigInt.zero;
 
-  while (k < BigInt.from(128)) {
-    var a = randomBigInt(128) % (n - BigInt.two) + BigInt.two;
+  while (k < BigInt.from(keySize)) {
+    var a = randomBigInt(keySize, random: Random.secure()) % (n - BigInt.two) +
+        BigInt.two;
     var v = a.modPow(s, n);
 
     if (v != BigInt.one) {
@@ -300,7 +303,7 @@ BigInt generateLargePrime(int k) {
   var rCopy = r;
 
   while (r > 0) {
-    var n = randomBigInt(k) %
+    var n = randomBigInt(k, random: Random.secure()) %
             (BigInt.two.pow(k) - BigInt.two.pow(k - 1)) +
         BigInt.two.pow(k - 1);
     BigInt.two.pow(k - 1);
