@@ -5,7 +5,7 @@ import './rsa/utils.dart' as utils
 import 'rsa/decrypt.dart' as decrypt show decryptRsa;
 import 'rsa/encrypt.dart' as encrypt show encryptRsa;
 
-const keySize = 256;
+const keySize =   128;
 late BigInt e;
 late BigInt d;
 late BigInt n;

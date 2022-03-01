@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:ninja_prime/ninja_prime.dart';
 
 /// Extended Euclidean algorithm
@@ -14,6 +16,19 @@ List<BigInt> egcd(BigInt a, BigInt b) {
   var x = res[2];
 
   return [g, x - (b ~/ a) * y, y];
+}
+
+/// Modular inverse, Raises: Exception: if [a] is not coprime to [m]
+BigInt modinv(BigInt a, BigInt m) {
+  var res = egcd(a, m);
+  var g = res[0];
+  var x = res[1];
+  // var y = res[2];
+
+  if (g != BigInt.one) {
+    throw Exception('modular inverse does not exist');
+  }
+  return x % m;
 }
 
 /// Generate RSA Keys
@@ -72,7 +87,7 @@ bool rabinMiller(BigInt n) {
   var k = BigInt.zero;
 
   while (k < BigInt.from(128)) {
-    var a = randomBigInt(128, max: n - BigInt.from(3)) + BigInt.two;
+    var a = randomBigInt(128) % (n - BigInt.two) + BigInt.two;
     var v = a.modPow(s, n);
 
     if (v != BigInt.one) {
@@ -88,7 +103,6 @@ bool rabinMiller(BigInt n) {
     }
     k = k + BigInt.two;
   }
-
   return true;
 }
 
@@ -271,13 +285,8 @@ bool isPrime(BigInt n) {
   if (n >= BigInt.from(3)) {
     if (n & BigInt.one != BigInt.zero) {
       for (var p in lowPrimes) {
-        if (n == p) {
-          return true;
-        }
-
-        if (n % p == BigInt.zero) {
-          return false;
-        }
+        if (n == p) return true;
+        if (n % p == BigInt.zero) return false;
       }
       return rabinMiller(n);
     }
@@ -287,5 +296,17 @@ bool isPrime(BigInt n) {
 
 ///Generate large prime number of length k
 BigInt generateLargePrime(int k) {
-  return randomPrimeBigInt(k);
+  var r = (100 * (log(k) / log(2) + 1)).floor();
+  var rCopy = r;
+
+  while (r > 0) {
+    var n = randomBigInt(k) %
+            (BigInt.two.pow(k) - BigInt.two.pow(k - 1)) +
+        BigInt.two.pow(k - 1);
+    BigInt.two.pow(k - 1);
+    r--;
+
+    if (isPrime(n)) return n;
+  }
+  throw Exception('failure after $rCopy tries');
 }
