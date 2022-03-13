@@ -1,40 +1,6 @@
 import 'dart:io';
-
-import './rsa/utils.dart' as utils
-    show generateLargePrime, generateKeys, str2BigInt, bigIntToStr, keySize;
-import 'rsa/decrypt.dart' as decrypt show decryptRsa;
-import 'rsa/encrypt.dart' as encrypt show encryptRsa;
-
-late BigInt e;
-late BigInt d;
-late BigInt n;
-
-void generateNewKeys() {
-  var p = utils.generateLargePrime(utils.keySize);
-  var q = utils.generateLargePrime(utils.keySize);
-
-  // print('');
-  // print('Generating primes...');
-  // print('p: $p');
-  // print('q: $q');
-
-  var res = utils.generateKeys(p, q);
-  e = res[0];
-  d = res[1];
-  n = res[2];
-  print('Keys Generated!!');
-  showPublicKeys();
-}
-
-void showPublicKeys() {
-  print('');
-  print('Public key: ');
-  print('e: $e');
-  print('n: $n');
-  // print('Private key: ');
-  // print('d: $d');
-  // print('n: $n');
-}
+import 'utils.dart' as utils;
+import 'rsa.dart' show Rsa;
 
 void encryptMessage() {
   stdout.write('Message: ');
@@ -44,20 +10,20 @@ void encryptMessage() {
   var recpE = BigInt.parse(stdin.readLineSync()!);
   stdout.write('Enter n: ');
   var recpN = BigInt.parse(stdin.readLineSync()!);
-  print('e: $e');
-  var c = encrypt.encryptRsa(m, recpE, recpN);
+  var c = Rsa.encryptRsa(m, recpE, recpN);
   print('Encrypted message: $c');
 }
 
-void decryptMessage() {
+void decryptMessage(Rsa rsa) {
   stdout.write('Ciphertext: ');
   var c = BigInt.parse(stdin.readLineSync()!);
-  var m = utils.bigIntToStr(decrypt.decryptRsa(c, d, n));
+  rsa.decryptRsa(c);
+  var m = utils.bigIntToStr(rsa.decryptRsa(c));
   print('Decrypted message: $m');
 }
 
 void main(List<String> arguments) {
-  generateNewKeys();
+  Rsa rsa = Rsa();
   while (true) {
     print('');
     print('┌──────────────────────────────────────────────────────────────┐');
@@ -73,13 +39,13 @@ void main(List<String> arguments) {
     var option = int.parse(stdin.readLineSync()!);
 
     if (option == 1) {
-      generateNewKeys();
+      rsa = Rsa();
     } else if (option == 2) {
-      showPublicKeys();
+      print(rsa);
     } else if (option == 3) {
       encryptMessage();
     } else if (option == 4) {
-      decryptMessage();
+      decryptMessage(rsa);
     } else {
       print('Byeeeee!');
       break;
